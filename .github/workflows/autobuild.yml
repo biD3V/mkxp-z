@@ -206,6 +206,7 @@ jobs:
         uses: uraimo/run-on-arch-action@v2.5.1
         with:
           arch: aarch64
+          distro: ubuntu20.04
           githubToken: ${{ github.token }}
           run: |
             cd linux
@@ -225,7 +226,8 @@ jobs:
             cp "$PWD/local.zp" "/artifacts/local.zip"
           install: |
             sudo apt update
-            sudo apt install git build-essential cmake meson autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev -y
+            sudo apt install git build-essential cmake autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev python3-pip -y
+            sudo python3 -m pip install meson==0.57.2 ninja==1.10.2
 
       - uses: actions/upload-artifact@v3
         with:
