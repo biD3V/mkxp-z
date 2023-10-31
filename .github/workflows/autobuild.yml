@@ -10,178 +10,178 @@ on:
     paths-ignore: ['*.md', '*.json', '*.png']
 
 jobs:
-  build-windows:
-    name: Windows
-    runs-on: windows-latest
-    steps:
-      - uses: benjlevesque/short-sha@v2.2
-        id: short-sha
-        with:
-          length: 7
+  # build-windows:
+  #   name: Windows
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: benjlevesque/short-sha@v2.2
+  #       id: short-sha
+  #       with:
+  #         length: 7
 
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: mingw64
-          install: >-
-            base-devel
-            git
-            ruby
-            vim
-            mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-meson
-            mingw-w64-x86_64-autotools
-            mingw-w64-x86_64-gcc
+  #     - uses: msys2/setup-msys2@v2
+  #       with:
+  #         msystem: mingw64
+  #         install: >-
+  #           base-devel
+  #           git
+  #           ruby
+  #           vim
+  #           mingw-w64-x86_64-cmake
+  #           mingw-w64-x86_64-meson
+  #           mingw-w64-x86_64-autotools
+  #           mingw-w64-x86_64-gcc
 
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
-        with:
-          path: |
-            windows/build-mingw64
-            windows/downloads
-          key: win-${{ hashFiles('windows/Makefile') }}
+  #     - uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           windows/build-mingw64
+  #           windows/downloads
+  #         key: win-${{ hashFiles('windows/Makefile') }}
 
-      - name: Build all dependencies
-        shell: msys2 {0}
-        run: |
-          cd windows
-          make
+  #     - name: Build all dependencies
+  #       shell: msys2 {0}
+  #       run: |
+  #         cd windows
+  #         make
 
-      - name: Build exe
-        shell: msys2 {0}
-        run: |
-          source windows/vars.sh
-          meson build
-          cd build
-          ninja
-          strip ./mkxp-z.exe
+  #     - name: Build exe
+  #       shell: msys2 {0}
+  #       run: |
+  #         source windows/vars.sh
+  #         meson build
+  #         cd build
+  #         ninja
+  #         strip ./mkxp-z.exe
 
-      - name: Prepare archive
-        shell: msys2 {0}
-        run: |
-          mkdir build/artifact
-          cd build/artifact
-          cp /mingw64/bin/zlib1.dll .
-          cp ../../windows/build-mingw64/bin/x64-msvcrt-ruby310.dll .
-          cp -r ../../windows/build-mingw64/lib/ruby/3.1.0 .
-          mv ./3.1.0 ./stdlib
-          cp ../mkxp-z.exe .
-          cp ../../mkxp.json .
-          cp -r ../../scripts .
+  #     - name: Prepare archive
+  #       shell: msys2 {0}
+  #       run: |
+  #         mkdir build/artifact
+  #         cd build/artifact
+  #         cp /mingw64/bin/zlib1.dll .
+  #         cp ../../windows/build-mingw64/bin/x64-msvcrt-ruby310.dll .
+  #         cp -r ../../windows/build-mingw64/lib/ruby/3.1.0 .
+  #         mv ./3.1.0 ./stdlib
+  #         cp ../mkxp-z.exe .
+  #         cp ../../mkxp.json .
+  #         cp -r ../../scripts .
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: mkxp-z.windows.${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.ref_name}}-${{steps.short-sha.outputs.sha}}
-          path: |
-            build/artifact/*.dll
-            build/artifact/*.exe
-            build/artifact/mkxp.json
-            build/artifact/scripts/
-            build/artifact/stdlib/
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: mkxp-z.windows.${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.ref_name}}-${{steps.short-sha.outputs.sha}}
+  #         path: |
+  #           build/artifact/*.dll
+  #           build/artifact/*.exe
+  #           build/artifact/mkxp.json
+  #           build/artifact/scripts/
+  #           build/artifact/stdlib/
 
-  build-linux:
-    name: Ubuntu 22.04
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: benjlevesque/short-sha@v2.2
-        id: short-sha
-        with:
-          length: 7
+  # build-linux:
+  #   name: Ubuntu 22.04
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: benjlevesque/short-sha@v2.2
+  #       id: short-sha
+  #       with:
+  #         length: 7
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
-        with:
-          path: |
-            linux/build-x86_64
-            linux/downloads
-          key: lin-${{ hashFiles('linux/Makefile') }}
+  #     - uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           linux/build-x86_64
+  #           linux/downloads
+  #         key: lin-${{ hashFiles('linux/Makefile') }}
 
-      - name: Install apt dependencies
-        run: |
-          sudo apt update
-          sudo apt install git build-essential cmake meson autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev -y
+  #     - name: Install apt dependencies
+  #       run: |
+  #         sudo apt update
+  #         sudo apt install git build-essential cmake meson autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev -y
 
-      - name: Build everything else
-        run: |
-          cd linux
-          make
+  #     - name: Build everything else
+  #       run: |
+  #         cd linux
+  #         make
 
-      - name: Build executable
-        run: |
-          source linux/vars.sh
-          meson build --bindir=. --prefix=$GITHUB_WORKSPACE/build/local
-          cd build
-          ninja
-          ninja install
+  #     - name: Build executable
+  #       run: |
+  #         source linux/vars.sh
+  #         meson build --bindir=. --prefix=$GITHUB_WORKSPACE/build/local
+  #         cd build
+  #         ninja
+  #         ninja install
 
-      - name: Prepare archive
-        run: |
-          cd build/local
-          cp -r ../../linux/build-x86_64/lib/ruby/3.1.0 .
-          mv ./3.1.0 ./stdlib
-          cp ../../mkxp.json .
-          cp -r ../../scripts .
-          cd ..
-          zip -r local.zip local
+  #     - name: Prepare archive
+  #       run: |
+  #         cd build/local
+  #         cp -r ../../linux/build-x86_64/lib/ruby/3.1.0 .
+  #         mv ./3.1.0 ./stdlib
+  #         cp ../../mkxp.json .
+  #         cp -r ../../scripts .
+  #         cd ..
+  #         zip -r local.zip local
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: mkxp-z.linux.${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.ref_name}}-${{steps.short-sha.outputs.sha}}
-          path: build/local.zip
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: mkxp-z.linux.${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.ref_name}}-${{steps.short-sha.outputs.sha}}
+  #         path: build/local.zip
 
-  build-macos:
-    name: macOS
-    runs-on: macos-latest
-    steps:
-      - uses: benjlevesque/short-sha@v2.2
-        id: short-sha
-        with:
-          length: 7
+  # build-macos:
+  #   name: macOS
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: benjlevesque/short-sha@v2.2
+  #       id: short-sha
+  #       with:
+  #         length: 7
 
-      - name: Remove pre-existing homebrew packages
-        run: brew remove --force $(brew list)
+  #     - name: Remove pre-existing homebrew packages
+  #       run: brew remove --force $(brew list)
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
-        with:
-          path: |
-            macos/Dependencies/build-macosx-x86_64
-            macos/Dependencies/build-macosx-arm64
-            macos/Dependencies/build-macosx-universal
-            macos/Dependencies/downloads
-          key: mac-${{ hashFiles('macos/Dependencies/*.make', 'macos/Dependencies/*.sh') }}
+  #     - uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           macos/Dependencies/build-macosx-x86_64
+  #           macos/Dependencies/build-macosx-arm64
+  #           macos/Dependencies/build-macosx-universal
+  #           macos/Dependencies/downloads
+  #         key: mac-${{ hashFiles('macos/Dependencies/*.make', 'macos/Dependencies/*.sh') }}
 
-      - name: Install Homebrew tools
-        run: |
-          cd macos/Dependencies
-          brew bundle
+  #     - name: Install Homebrew tools
+  #       run: |
+  #         cd macos/Dependencies
+  #         brew bundle
 
-      - name: Build all dependencies
-        run: |
-          cd macos/Dependencies
-          ./setup.sh
+  #     - name: Build all dependencies
+  #       run: |
+  #         cd macos/Dependencies
+  #         ./setup.sh
 
-      - name: Build app
-        run: |
-          cd macos
-          xcodebuild -project mkxp-z.xcodeproj -configuration "Release" -scheme "Universal" -derivedDataPath "$GITHUB_WORKSPACE/build"
+  #     - name: Build app
+  #       run: |
+  #         cd macos
+  #         xcodebuild -project mkxp-z.xcodeproj -configuration "Release" -scheme "Universal" -derivedDataPath "$GITHUB_WORKSPACE/build"
 
-      - name: Compress app
-        run: |
-          cd build/Build/Products/Release
-          ditto -c -k --sequesterRsrc --keepParent Z-universal.app Z-universal.app.zip
+  #     - name: Compress app
+  #       run: |
+  #         cd build/Build/Products/Release
+  #         ditto -c -k --sequesterRsrc --keepParent Z-universal.app Z-universal.app.zip
 
-      - name: Upload archive
-        uses: actions/upload-artifact@v3
-        with:
-          name: mkxp-z.macos.${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.ref_name}}-${{steps.short-sha.outputs.sha}}
-          path: build/Build/Products/Release/Z-universal.app.zip
+  #     - name: Upload archive
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: mkxp-z.macos.${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.ref_name}}-${{steps.short-sha.outputs.sha}}
+  #         path: build/Build/Products/Release/Z-universal.app.zip
 
   build-linux-arm64:
     name: linux-arm64
@@ -209,9 +209,9 @@ jobs:
           distro: ubuntu20.04
           githubToken: ${{ github.token }}
           run: |
-            sudo apt update
-            sudo apt install git build-essential cmake autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev python3-pip -y
-            sudo python3 -m pip install meson==0.57.2 ninja==1.10.2
+            apt update
+            apt install git build-essential cmake autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev python3-pip -y
+            python3 -m pip install meson==0.57.2 ninja==1.10.2
             cd linux
             make
             source vars.sh
