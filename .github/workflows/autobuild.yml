@@ -182,3 +182,52 @@ jobs:
         with:
           name: mkxp-z.macos.${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.ref_name}}-${{steps.short-sha.outputs.sha}}
           path: build/Build/Products/Release/Z-universal.app.zip
+
+  build-linux-arm64:
+    name: linux-arm64
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: benjlevesque/short-sha@v2.2
+        id: short-sha
+        with:
+          length: 7
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            linux/build-aarch64
+            linux/downloads
+          key: lin-${{ hashFiles('linux/Makefile') }}
+          
+      - name: Run on architecture
+        uses: uraimo/run-on-arch-action@v2.5.1
+        with:
+          arch: aarch64
+          githubToken: ${{ github.token }}
+          run: |
+            cd linux
+            make
+            source vars.sh
+            cd ..; meson build
+            cd build && ninja
+            meson configure --bindir=. --prefix=$PWD/local
+            ninja install
+            cd local
+            cp -r ../../linux/build-aarch64/lib/ruby/3.1.0 .
+            mv ./3.1.0 ./stdlib
+            cp ../../mkxp.json .
+            cp -r ../../scripts .
+            cd ..
+            zip -r local.zip local
+            cp "$PWD/local.zp" "/artifacts/local.zip"
+          install: |
+            sudo apt update
+            sudo apt install git build-essential cmake meson autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev -y
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mkxp-z.linuxarm64.${{github.event_name == 'pull_request' && format('PR{0}', github.event.number) || github.ref_name}}-${{steps.short-sha.outputs.sha}}
+          path: ${PWD}/artifacts/local.zip
