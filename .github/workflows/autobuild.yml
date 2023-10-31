@@ -202,7 +202,7 @@ jobs:
             linux/downloads
           key: lin-${{ hashFiles('linux/Makefile') }}
           
-      - name: Run on architecture
+      - name: Build aarch64
         uses: uraimo/run-on-arch-action@v2.5.1
         with:
           arch: aarch64
