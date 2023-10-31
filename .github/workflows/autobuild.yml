@@ -210,7 +210,7 @@ jobs:
           githubToken: ${{ github.token }}
           run: |
             apt update
-            apt install git build-essential cmake autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev python3-pip -y
+            apt install git build-essential cmake autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev python3-pip wget -y
             python3 -m pip install meson==0.57.2 ninja==1.10.2
             cd linux
             make
