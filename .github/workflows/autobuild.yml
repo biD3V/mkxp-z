@@ -195,7 +195,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/cache@v3
+      - name: always-upload-cache
+        uses: pat-s/always-upload-cache@v3.0.11
         with:
           path: |
             linux/build-aarch64
