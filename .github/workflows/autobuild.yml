@@ -185,7 +185,7 @@ jobs:
 
   build-linux-arm64:
     name: linux-arm64
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: benjlevesque/short-sha@v2.2
         id: short-sha
@@ -201,6 +201,7 @@ jobs:
           path: |
             linux/build-aarch64
             linux/downloads
+            !linx/downloads/aarch64/ruby
           key: lin-${{ hashFiles('linux/Makefile') }}
           
       - name: Build aarch64
@@ -209,10 +210,11 @@ jobs:
           arch: aarch64
           distro: ubuntu20.04
           githubToken: ${{ github.token }}
-          run: |
+          install: |
             apt update
             apt install git build-essential cmake autoconf automake libtool pkg-config ruby bison zlib1g-dev libbz2-dev xorg-dev libgl1-mesa-dev libasound2-dev libpulse-dev python3-pip wget -y
             python3 -m pip install meson==0.57.2 ninja==1.10.2
+          run: |
             cd linux
             make
             source vars.sh
