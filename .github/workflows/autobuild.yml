@@ -200,7 +200,7 @@ jobs:
         with:
           path: |
             linux/build-aarch64
-            linux/downloads
+            linux/downloads/*
             !linx/downloads/aarch64/ruby
           key: lin-${{ hashFiles('linux/Makefile') }}
           
